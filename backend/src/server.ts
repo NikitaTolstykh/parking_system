@@ -1,43 +1,34 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import fs from 'fs';
-import path from 'path';
+import { login, getBalance, addBalance } from './userService';
 
 const app = express();
 const PORT = 3000;
-const DB_PATH = path.join(__dirname, '../../db/db.json');
 
 app.use(cors());
 app.use(bodyParser.json());
-
-function readDB() {
-    const data = fs.readFileSync(DB_PATH, 'utf-8');
-    return JSON.parse(data);
-}
-
-function saveDB(data: any) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
 
 app.get('/ping', (req, res) => {
     res.json({ message: 'pong' });
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const db = readDB();
-    const user = db.users.find((u: any) => u.email === email);
+    const result = await login(email, password);
+    res.status(result.success ? 200 : 400).json(result);
+});
 
-    if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-    }
+app.get('/balance/:email', async (req, res) => {
+    const { email } = req.params;
+    const result = await getBalance(email);
+    res.status(result.success ? 200 : 400).json(result);
+});
 
-    if (user.password !== password) {
-        return res.status(400).json({ message: 'Wrong password' });
-    }
-
-    res.json({ message: 'Login successful', user });
+app.post('/add-balance', async (req, res) => {
+    const { email, amount } = req.body;
+    const result = await addBalance(email, amount);
+    res.status(result.success ? 200 : 400).json(result);
 });
 
 app.listen(PORT, () => {
