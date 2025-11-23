@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node backend/src/server.ts",
-    "init-db": "node -e \"require('sqlite3').verbose().Database('./db/db.sqlite', err => { if (err) console.error(err); else console.log('DB created'); })\""
+    "init-db": "node -e \"require('sqlite3').verbose().Database('backend/db/db.sqlite', err => { if (err) console.error(err); else console.log('DB created'); })\""
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
